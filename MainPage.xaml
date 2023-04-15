@@ -18,6 +18,7 @@
             <TableRoot>
                 <TableSection Title="For Huffman">
                     <TextCell x:Name="encodedTimeForHuffman"/>
+                    <TextCell x:Name="decodedTimeForHuffman"/>
                     <TextCell x:Name="originalFileSizeForHuffman"/>
                     <TextCell x:Name="encodedFileSizeForHuffman"/>
                 </TableSection>
@@ -27,6 +28,7 @@
             <TableRoot>
                 <TableSection Title="For LZW">
                     <TextCell x:Name="encodedTimeForLZW"/>
+                    <TextCell x:Name="decodedTimeForLZW"/>
                     <TextCell x:Name="originalFileSizeForLZW"/>
                     <TextCell x:Name="encodedFileSizeForLZW"/>
                 </TableSection>

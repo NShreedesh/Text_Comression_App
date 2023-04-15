@@ -32,8 +32,9 @@ public partial class MainPage : ContentPage
     private async Task HuffmanExecute(FileResult selectedFile)
     {
         TimeSpan encodeTime;
+        TimeSpan decodeTime;
         StreamReader streamReader = new StreamReader(selectedFile.FullPath);
-        long originalFileSize = new FileInfo(selectedFile.FullPath).Length / 1024;
+        long originalFileSize = new FileInfo(selectedFile.FullPath).Length;
         string textInput = await streamReader.ReadToEndAsync()!;
 
         string input = textInput;
@@ -63,22 +64,29 @@ public partial class MainPage : ContentPage
 
         // Decode
         infoLabel.Text = "Decoding Via Huffman...";
+        stopwatch.Restart();
         string decoded = await huffmanTree.Decode(neededDecodedBits);
+        stopwatch.Stop();
+        decodeTime = stopwatch.Elapsed;
+
+        infoLabel.Text = "Writing decoded Text...";
         await File.WriteAllTextAsync(decodedFile, decoded);
         streamReader.Close();
-        long encodedFileSize = new FileInfo(encodedFile).Length / 1024;
+        long encodedFileSize = new FileInfo(encodedFile).Length;
 
         encodedTimeForHuffman.Text = $"EncodedTime: {encodeTime}";
-        originalFileSizeForHuffman.Text = $"Original File Size: {originalFileSize}";
-        encodedFileSizeForHuffman.Text = $"Encoded File Size: {encodedFileSize}";
+        decodedTimeForHuffman.Text = $"DeocodedTime: {decodeTime}";
+        originalFileSizeForHuffman.Text = $"Original File Size: {(float)originalFileSize / 1024} Kb";
+        encodedFileSizeForHuffman.Text = $"Encoded File Size: {(float)encodedFileSize / 1024} Kb";
     }
     
     private async Task LZWExecute(FileResult selectedFile)
     {
         int padLeftValue = 16;
         TimeSpan encodeTime;
+        TimeSpan decodeTime;
         StreamReader streamReader = new StreamReader(selectedFile.FullPath);
-        long originalFileSize = new FileInfo(selectedFile.FullPath).Length / 1024;
+        long originalFileSize = new FileInfo(selectedFile.FullPath).Length;
         string textInput = await streamReader.ReadToEndAsync()!;
 
 
@@ -109,11 +117,12 @@ public partial class MainPage : ContentPage
         File.WriteAllBytes(encodedFile, encodedBytes);
 
         // Decode
-        infoLabel.Text = "Decoding Via Lzw...";
         byte[] readByte = await File.ReadAllBytesAsync(encodedFile);
         BitArray decodedBits = new BitArray(readByte);
         string decodedString = "";
         List<int> deCompressedList = new List<int>();
+
+        infoLabel.Text = "Extra Work...";
         await Task.Run(() =>
         {
             foreach (bool bit in decodedBits)
@@ -129,14 +138,19 @@ public partial class MainPage : ContentPage
             }
         });
 
+        infoLabel.Text = "Decoding Via Lzw...";
+        stopwatch.Restart();
         string decompressed = await lzw.Decompress(deCompressedList);
+        stopwatch.Stop();
+        decodeTime = stopwatch.Elapsed;
         await File.WriteAllTextAsync(decodedFile, decompressed);
         streamReader.Close();
 
-        long encodedFileSize = new FileInfo(encodedFile).Length / 1024;
+        long encodedFileSize = new FileInfo(encodedFile).Length;
         encodedTimeForLZW.Text = $"EncodedTime: {encodeTime}";
-        originalFileSizeForLZW.Text = $"Original File Size: {originalFileSize}";
-        encodedFileSizeForLZW.Text = $"Encoded File Size: {encodedFileSize}";
+        decodedTimeForLZW.Text = $"DecodedTime: {decodeTime}";
+        originalFileSizeForLZW.Text = $"Original File Size: {(float)originalFileSize / 1024} Kb";
+        encodedFileSizeForLZW.Text = $"Encoded File Size: {(float)encodedFileSize / 1024} Kb";
     }
 }
 
