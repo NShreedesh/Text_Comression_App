@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Diagnostics;
 using TextCompression.Huffman;
+using TextCompression.LZW;
 
 namespace TextCompressionApp;
 
@@ -17,12 +18,20 @@ public partial class MainPage : ContentPage
 
     private async void SelectFileClicked(object sender, EventArgs e)
     {
-        var selectedFile = await FilePicker.Default.PickAsync(PickOptions.Default);
+        FileResult selectedFile = await FilePicker.Default.PickAsync(PickOptions.Default);
         if (selectedFile == null) return;
 
         activityIndicator.IsRunning = true;
-        TimeSpan encodeTime;
 
+        //await HuffmanExecute(selectedFile);
+        await LZWExecute(selectedFile);
+
+        activityIndicator.IsRunning = false;
+    }
+
+    private async Task HuffmanExecute(FileResult selectedFile)
+    {
+        TimeSpan encodeTime;
         StreamReader streamReader = new StreamReader(selectedFile.FullPath);
         long originalFileSize = new FileInfo(selectedFile.FullPath).Length / 1024;
         string textInput = await streamReader.ReadToEndAsync()!;
@@ -34,7 +43,7 @@ public partial class MainPage : ContentPage
 
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
-        infoLabel.Text = "Encoding...";
+        infoLabel.Text = "Encoding Via Huffman...";
         // Encode
         BitArray encoded = await huffmanTree.Encode(input);
         stopwatch.Stop();
@@ -53,7 +62,7 @@ public partial class MainPage : ContentPage
         }
 
         // Decode
-        infoLabel.Text = "Decoding...";
+        infoLabel.Text = "Decoding Via Huffman...";
         string decoded = await huffmanTree.Decode(neededDecodedBits);
         await File.WriteAllTextAsync(decodedFile, decoded);
         streamReader.Close();
@@ -62,8 +71,73 @@ public partial class MainPage : ContentPage
         encodedTimeLabel.Text = $"EncodedTime: {encodeTime.ToString("m\\:ss")}";
         originalFileSizeLabel.Text = $"Original File Size: {originalFileSize}";
         encodedFileSizeLabel.Text = $"Encoded File Size: {encodedFileSize}";
+    }
+    
+    private async Task LZWExecute(FileResult selectedFile)
+    {
+        int padLeftValue = 16;
+        TimeSpan encodeTime;
+        StreamReader streamReader = new StreamReader(selectedFile.FullPath);
+        long originalFileSize = new FileInfo(selectedFile.FullPath).Length / 1024;
+        string textInput = await streamReader.ReadToEndAsync()!;
 
-        activityIndicator.IsRunning = false;
+
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        infoLabel.Text = "Encoding Via LZW...";
+        LZW lzw = new LZW();
+        List<int> compressedInputs = await lzw.Compress(textInput);
+        stopwatch.Stop();
+        encodeTime = stopwatch.Elapsed;
+
+        //Encode
+        List<bool> encodedBoolean = new List<bool>();
+        foreach (int compressedValue in compressedInputs)
+        {
+            string binaryString = Convert.ToString(compressedValue, 2).PadLeft(padLeftValue, '0');
+            foreach (char binaryChar in binaryString)
+            {
+                if (binaryChar == '0')
+                    encodedBoolean.Add(false);
+                else
+                    encodedBoolean.Add(true);
+            }
+        }
+        BitArray encoded = new BitArray(encodedBoolean.ToArray());
+        byte[] encodedBytes = new byte[encoded.Count / 8 + (encoded.Count % 8 == 0 ? 0 : 1)];
+        encoded.CopyTo(encodedBytes, 0);
+        File.WriteAllBytes(encodedFile, encodedBytes);
+
+        // Decode
+        infoLabel.Text = "Decoding Via Lzw...";
+        byte[] readByte = await File.ReadAllBytesAsync(encodedFile);
+        BitArray decodedBits = new BitArray(readByte);
+        string decodedString = "";
+        List<int> deCompressedList = new List<int>();
+        await Task.Run(() =>
+        {
+            foreach (bool bit in decodedBits)
+            {
+                decodedString += bit ? 1 : 0;
+            }
+
+            Debug.WriteLine("Hello World1--------------");
+            for (int i = 0; i < decodedString.Length; i += padLeftValue)
+            {
+                string binaryString = decodedString.Substring(i, padLeftValue);
+                int deCompressedInt = Convert.ToInt32(binaryString, 2);
+                deCompressedList.Add(deCompressedInt);
+            }
+        });
+
+        string decompressed = await lzw.Decompress(deCompressedList);
+        await File.WriteAllTextAsync(decodedFile, decompressed);
+        streamReader.Close();
+
+        long encodedFileSize = new FileInfo(encodedFile).Length / 1024;
+        encodedTimeLabel.Text = $"EncodedTime: {encodeTime.ToString("m\\:ss")}";
+        originalFileSizeLabel.Text = $"Original File Size: {originalFileSize}";
+        encodedFileSizeLabel.Text = $"Encoded File Size: {encodedFileSize}";
     }
 }
 
