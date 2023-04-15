@@ -38,7 +38,5 @@
                 </TableRoot>
             </TableView>
         </HorizontalStackLayout>
-        
-
     </VerticalStackLayout>
 </ContentPage>
