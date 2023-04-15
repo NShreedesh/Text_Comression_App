@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Diagnostics;
+using System.Text;
 using TextCompression.Huffman;
 using TextCompression.LZW;
 
@@ -78,7 +79,7 @@ public partial class MainPage : ContentPage
         decodedTimeForHuffman.Text = $"DeCompressed Time: {decodeTime} ms";
         originalFileSizeForHuffman.Text = $"Original File Size: {(float)originalFileSize / 1024} Kb";
         encodedFileSizeForHuffman.Text = $"Encoded File Size: {(float)encodedFileSize / 1024} Kb";
-        compressionRatioForHuffman.Text = $"Compression Ratio: {(((float)encodedFileSize / originalFileSize) * 100).ToString("00.00")}%";
+        compressionRatioForHuffman.Text = $"Compression Ratio: {((float)originalFileSize / encodedFileSize).ToString("00.00")}";
     }
     
     private async Task LZWExecute(FileResult selectedFile)
@@ -155,7 +156,7 @@ public partial class MainPage : ContentPage
         decodedTimeForLZW.Text = $"DeCompressed Time: {decodeTime}";
         originalFileSizeForLZW.Text = $"Original File Size: {(float)originalFileSize / 1024} Kb";
         encodedFileSizeForLZW.Text = $"Encoded File Size: {(float)encodedFileSize / 1024} Kb";
-        compressionRatioForLZW.Text = $"Compression Ratio: {(((float)encodedFileSize / originalFileSize) * 100).ToString("00.00")}%";
+        compressionRatioForLZW.Text = $"Compression Ratio: {(originalFileSize / encodedFileSize).ToString("00.00")}";
     }
 }
 
