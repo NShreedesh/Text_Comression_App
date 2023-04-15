@@ -74,10 +74,11 @@ public partial class MainPage : ContentPage
         streamReader.Close();
         long encodedFileSize = new FileInfo(encodedFile).Length;
 
-        encodedTimeForHuffman.Text = $"EncodedTime: {encodeTime}";
-        decodedTimeForHuffman.Text = $"DeocodedTime: {decodeTime}";
+        encodedTimeForHuffman.Text = $"Compressed Time: {encodeTime} ms";
+        decodedTimeForHuffman.Text = $"DeCompressed Time: {decodeTime} ms";
         originalFileSizeForHuffman.Text = $"Original File Size: {(float)originalFileSize / 1024} Kb";
         encodedFileSizeForHuffman.Text = $"Encoded File Size: {(float)encodedFileSize / 1024} Kb";
+        compressionRatioForHuffman.Text = $"Compression: {(((float)encodedFileSize / originalFileSize) * 100).ToString("00.00")}%";
     }
     
     private async Task LZWExecute(FileResult selectedFile)
@@ -147,10 +148,11 @@ public partial class MainPage : ContentPage
         streamReader.Close();
 
         long encodedFileSize = new FileInfo(encodedFile).Length;
-        encodedTimeForLZW.Text = $"EncodedTime: {encodeTime}";
-        decodedTimeForLZW.Text = $"DecodedTime: {decodeTime}";
+        encodedTimeForLZW.Text = $"Compressed Time: {encodeTime}";
+        decodedTimeForLZW.Text = $"DeCompressed Time: {decodeTime}";
         originalFileSizeForLZW.Text = $"Original File Size: {(float)originalFileSize / 1024} Kb";
         encodedFileSizeForLZW.Text = $"Encoded File Size: {(float)encodedFileSize / 1024} Kb";
+        compressionRatioForLZW.Text = $"Compression: {(((float)encodedFileSize / originalFileSize) * 100).ToString("00.00")}%";
     }
 }
 

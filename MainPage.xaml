@@ -21,6 +21,7 @@
                     <TextCell x:Name="decodedTimeForHuffman"/>
                     <TextCell x:Name="originalFileSizeForHuffman"/>
                     <TextCell x:Name="encodedFileSizeForHuffman"/>
+                    <TextCell x:Name="compressionRatioForHuffman"/>
                 </TableSection>
             </TableRoot>
         </TableView>
@@ -31,6 +32,7 @@
                     <TextCell x:Name="decodedTimeForLZW"/>
                     <TextCell x:Name="originalFileSizeForLZW"/>
                     <TextCell x:Name="encodedFileSizeForLZW"/>
+                    <TextCell x:Name="compressionRatioForLZW"/>
                 </TableSection>
             </TableRoot>
         </TableView>
