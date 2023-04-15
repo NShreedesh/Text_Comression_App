@@ -23,7 +23,7 @@ public partial class MainPage : ContentPage
 
         activityIndicator.IsRunning = true;
 
-        //await HuffmanExecute(selectedFile);
+        await HuffmanExecute(selectedFile);
         await LZWExecute(selectedFile);
 
         activityIndicator.IsRunning = false;
@@ -68,9 +68,9 @@ public partial class MainPage : ContentPage
         streamReader.Close();
         long encodedFileSize = new FileInfo(encodedFile).Length / 1024;
 
-        encodedTimeLabel.Text = $"EncodedTime: {encodeTime.ToString("m\\:ss")}";
-        originalFileSizeLabel.Text = $"Original File Size: {originalFileSize}";
-        encodedFileSizeLabel.Text = $"Encoded File Size: {encodedFileSize}";
+        encodedTimeForHuffman.Text = $"EncodedTime: {encodeTime}";
+        originalFileSizeForHuffman.Text = $"Original File Size: {originalFileSize}";
+        encodedFileSizeForHuffman.Text = $"Encoded File Size: {encodedFileSize}";
     }
     
     private async Task LZWExecute(FileResult selectedFile)
@@ -121,7 +121,6 @@ public partial class MainPage : ContentPage
                 decodedString += bit ? 1 : 0;
             }
 
-            Debug.WriteLine("Hello World1--------------");
             for (int i = 0; i < decodedString.Length; i += padLeftValue)
             {
                 string binaryString = decodedString.Substring(i, padLeftValue);
@@ -135,9 +134,9 @@ public partial class MainPage : ContentPage
         streamReader.Close();
 
         long encodedFileSize = new FileInfo(encodedFile).Length / 1024;
-        encodedTimeLabel.Text = $"EncodedTime: {encodeTime.ToString("m\\:ss")}";
-        originalFileSizeLabel.Text = $"Original File Size: {originalFileSize}";
-        encodedFileSizeLabel.Text = $"Encoded File Size: {encodedFileSize}";
+        encodedTimeForLZW.Text = $"EncodedTime: {encodeTime}";
+        originalFileSizeForLZW.Text = $"Original File Size: {originalFileSize}";
+        encodedFileSizeForLZW.Text = $"Encoded File Size: {encodedFileSize}";
     }
 }
 
